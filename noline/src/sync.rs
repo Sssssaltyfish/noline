@@ -118,7 +118,11 @@ where
     }
 
     /// Load history from iterator
-    pub fn load_history<'a>(&mut self, entries: impl Iterator<Item = &'a str>) -> usize {
+    pub fn load_history<'a, Entry>(&mut self, entries: Entry) -> usize
+    where
+        Entry: Iterator,
+        Entry::Item: AsRef<str>,
+    {
         self.history.load_entries(entries)
     }
 

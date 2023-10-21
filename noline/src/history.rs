@@ -175,9 +175,9 @@ pub trait History: Default {
     fn number_of_entries(&self) -> usize;
 
     /// Add entries from an iterator
-    fn load_entries<'a, I: Iterator<Item = &'a str>>(&mut self, entries: I) -> usize {
+    fn load_entries<'a, I: Iterator<Item = impl AsRef<str>>>(&mut self, entries: I) -> usize {
         entries
-            .take_while(|entry| self.add_entry(entry).is_ok())
+            .take_while(|entry| self.add_entry(entry.as_ref()).is_ok())
             .count()
     }
 }
@@ -363,7 +363,7 @@ impl<'a, H: History> HistoryNavigator<'a, H> {
         if position < self.history.number_of_entries() - 1 {
             let position = self.set_position(position + 1);
 
-            Ok(self.history.get_entry(position).unwrap())
+            self.history.get_entry(position).ok_or_else(|| ())
         } else {
             Err(())
         }
